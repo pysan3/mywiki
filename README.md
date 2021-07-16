@@ -1,1 +1,1 @@
-# gravwiki
+# mywiki
