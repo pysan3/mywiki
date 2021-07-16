@@ -239,15 +239,10 @@ class Login
      */
     public function register(array $data, array $files = [])
     {
-        // Add defaults and mandatory fields.
-        $data += [
-            'username' => null,
-            'email' => null
-        ];
-
         if (!isset($data['groups'])) {
             //Add new user ACL settings
             $groups = (array) $this->config->get('plugins.login.user_registration.groups', []);
+
             if (\count($groups) > 0) {
                 $data['groups'] = $groups;
             }
@@ -255,39 +250,29 @@ class Login
 
         if (!isset($data['access'])) {
             $access = (array) $this->config->get('plugins.login.user_registration.access.site', []);
+
             if (\count($access) > 0) {
                 $data['access']['site'] = $access;
             }
         }
 
         // Validate fields from the form.
+        $username = $this->validateField('username', $data['username']);
         $password = $this->validateField('password1', $data['password'] ?? $data['password1'] ?? null);
         foreach ($data as $key => &$value) {
             $value = $this->validateField($key, $value, $key === 'password2' ? $password : '');
         }
         unset($value);
 
-        /** @var UserCollectionInterface $accounts */
-        $accounts = $this->grav['accounts'];
+        /** @var UserCollectionInterface $users */
+        $users = $this->grav['accounts'];
 
-        // Check whether username already exists.
-        $username = $data['username'];
-        if (!$username || $accounts->find($username, ['username'])->exists()) {
-            /** @var Language $language */
-            $language = $this->grav['language'];
-
-            throw new \RuntimeException($language->translate(['PLUGIN_LOGIN.USERNAME_NOT_AVAILABLE', $username]));
-        }
-        // Check whether email already exists.
-        $email = $data['email'];
-        if (!$email || $accounts->find($email, ['email'])->exists()) {
-            /** @var Language $language */
-            $language = $this->grav['language'];
-
-            throw new \RuntimeException($language->translate(['PLUGIN_LOGIN.EMAIL_NOT_AVAILABLE', $email]));
+        // Create user object and save it
+        $user = $users->load($username);
+        if ($user->exists()) {
+            throw new \RuntimeException('User ' . $username . ' cannot be registered: user already exists!');
         }
 
-        $user = $accounts->load($username);
         $user->update($data, $files);
         if (isset($data['groups'])) {
             $user->groups = $data['groups'];

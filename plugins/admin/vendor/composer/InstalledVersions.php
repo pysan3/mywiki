@@ -29,7 +29,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '0b66fc80312bf6a9553af43e825d731a627a90ed',
+    'reference' => '1acb94e85744589877484a13af715394b3558bd2',
     'name' => 'getgrav/grav-plugin-admin',
   ),
   'versions' => 
@@ -41,7 +41,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '0b66fc80312bf6a9553af43e825d731a627a90ed',
+      'reference' => '1acb94e85744589877484a13af715394b3558bd2',
     ),
     'laminas/laminas-xml' => 
     array (
@@ -79,12 +79,12 @@ private static $installed = array (
     ),
     'scssphp/scssphp' => 
     array (
-      'pretty_version' => 'v1.5.2',
-      'version' => '1.5.2.0',
+      'pretty_version' => 'v1.4.1',
+      'version' => '1.4.1.0',
       'aliases' => 
       array (
       ),
-      'reference' => '6fe16f169f55f5e793474fb210aac0a4481619e5',
+      'reference' => 'ba86c963b94ec7ebd6e19d90cdab90d89667dbf7',
     ),
     'symfony/polyfill-php72' => 
     array (

@@ -56,8 +56,7 @@ class MediaController extends AbstractController
             $field = null;
         }
 
-        $request = $this->getRequest();
-        $files = $request->getUploadedFiles();
+        $files = $this->getRequest()->getUploadedFiles();
         if ($field && isset($files['data'])) {
             $files = $files['data'];
             $parts = explode('.', $field);
@@ -90,16 +89,11 @@ class MediaController extends AbstractController
         $object->checkUploadedMediaFile($file, $filename, $field);
 
         try {
-            // TODO: This only merges main level data, but is good for ordering (for now).
-            $data = $flash->getData() ?? [];
-            $data = array_replace($data, (array)$this->getPost('data'));
-
             $crop = $this->getPost('crop');
             if (is_string($crop)) {
                 $crop = json_decode($crop, true, 512, JSON_THROW_ON_ERROR);
             }
 
-            $flash->setData($data);
             $flash->addUploadedFile($file, $field, $crop);
             $flash->save();
         } catch (Exception $e) {

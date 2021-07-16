@@ -5,7 +5,6 @@ import { config } from 'grav-config';
 import $ from 'jquery';
 import 'whatwg-fetch';
 
-const GIT_REGEX = /(?:git|ssh|https?|git@[-\w.]+):(\/\/)?(.*?)(\.git)(\/?|\#[-\d\w._]+?)$/;
 const WIZARD = $('[data-remodal-id="wizard"]');
 const RESET_LOCAL = $('[data-remodal-id="reset-local"]');
 const SERVICES = { 'github': 'github.com', 'bitbucket': 'bitbucket.org', 'gitlab': 'gitlab.com', 'allothers': 'allothers.repo' };
@@ -253,16 +252,9 @@ $(document).on('change', '[name="gitsync[repository]"]', () => {
 $(document).on('input', '[name="gitsync[repo_url]"]', (event) => {
     const target = $(event.currentTarget);
     const value = target.val();
-    const isGitURL = GIT_REGEX.test(value);
     const next = WIZARD.find('[data-gitsync-action="next"]');
 
-    target.removeClass('invalid');
-
-    if (!isGitURL) {
-        target.addClass('invalid');
-    }
-
-    if (isGitURL && value.length) {
+    if (value.length) {
         enableButton(next);
     } else {
         disableButton(next);

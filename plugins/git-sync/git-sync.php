@@ -6,7 +6,6 @@ use Composer\Autoload\ClassLoader;
 use Grav\Common\Config\Config;
 use Grav\Common\Data\Data;
 use Grav\Common\Grav;
-use Grav\Common\Page\Interfaces\PageInterface;
 use Grav\Common\Plugin;
 use Grav\Common\Scheduler\Scheduler;
 use Grav\Plugin\GitSync\AdminController;
@@ -377,14 +376,14 @@ class GitSyncPlugin extends Plugin
      */
     public function onAdminAfterSave(Event $event)
     {
+        if (!$this->grav['config']->get('plugins.git-sync.sync.on_save', true)) {
+            return;
+        }
+
         $obj           = $event['object'];
         $adminPath	   = trim($this->grav['admin']->base, '/');
         $uriPath       = $this->grav['uri']->path();
         $isPluginRoute = $uriPath === "/$adminPath/plugins/" . $this->name;
-
-        if ($obj instanceof PageInterface && !$this->grav['config']->get('plugins.git-sync.sync.on_save', true)) {
-            return;
-        }
 
         if ($obj instanceof Data) {
             $folders = $this->git->getConfig('folders', $event['object']->get('folders', []));

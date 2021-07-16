@@ -90,8 +90,7 @@ EOF
             Helper::prepareRepository(
               $plugin->getUser() ?? '',
               $password,
-              $repository),
-            $plugin->getRemote('branch', null),
+              $repository)
         );
         $this->console_log($testRepository, $password);
 

@@ -1,11 +1,7 @@
 {% extends 'partials/base.html.twig' %}
 {% use 'flex-objects/types/default/titlebar/edit.html.twig' %}
 
-{# Avoid defining form and object twice: object should always come from the form! #}
-{% if form is not defined %}
-  {% set form = object.form %}
-  {% set object = form.object %}
-{% endif %}
+{% set form = form ?? object.form %}
 
 {# Allowed actions #}
 {% set can_list = can_list ?? directory.isAuthorized('list', 'admin', user) %}
@@ -55,7 +51,7 @@
 {% block body %}
     {% set back_url = back_url ?? admin_route(back_route) %}
     {% set id = key %}
-    {% set blueprint = blueprint ?? form.blueprint %}
+    {% set blueprint = blueprint ?? object.blueprint ?? directory.blueprint %}
 
     {{ parent() }}
 {% endblock body %}

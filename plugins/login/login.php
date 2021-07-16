@@ -104,29 +104,27 @@ class LoginPlugin extends Plugin
         $user = $session->user ?? null;
         if ($user && $user->exists() && ($this->config()['session_user_sync'] ?? false)) {
             // User is stored into the filesystem.
-            if ($user instanceof FlexObjectInterface && version_compare(GRAV_VERSION, '1.7.13', '>=')) {
-                $user->refresh(true);
+
+            /** @var UserCollectionInterface $accounts */
+            $accounts = $this->grav['accounts'];
+
+            /** @var UserObject $stored */
+            if ($accounts instanceof FlexCollectionInterface) {
+                $stored = $accounts[$user->username];
+                if (is_callable([$stored, 'refresh'])) {
+                    $stored->refresh();
+                }
             } else {
                 // TODO: remove when removing legacy support.
-                /** @var UserCollectionInterface $accounts */
-                $accounts = $this->grav['accounts'];
-                if ($accounts instanceof FlexCollectionInterface) {
-                    /** @var UserObject $stored */
-                    $stored = $accounts[$user->username];
-                    if (is_callable([$stored, 'refresh'])) {
-                        $stored->refresh(true);
-                    }
-                } else {
-                    $stored = $accounts->load($user->username);
-                }
+                $stored = $accounts->load($user->username);
+            }
 
-                if ($stored && $stored->exists()) {
-                    // User still exists, update user object in the session.
-                    $user->update($stored->jsonSerialize());
-                } else {
-                    // User doesn't exist anymore, prepare for session invalidation.
-                    $user->state = 'disabled';
-                }
+            if ($stored && $stored->exists()) {
+                // User still exists, update user object in the session.
+                $user->update($stored->jsonSerialize());
+            } else {
+                // User doesn't exist anymore, prepare for session invalidation.
+                $user->state = 'disabled';
             }
 
             if ($user->state !== 'enabled') {
@@ -457,7 +455,7 @@ class LoginPlugin extends Plugin
         $token = $uri->param('token');
         $user = $users->load($username);
         if (is_callable([$user, 'refresh'])) {
-            $user->refresh(true);
+            $user->refresh();
         }
 
         $redirect_route = $this->config->get('plugins.login.user_registration.redirect_after_activation');
@@ -1116,7 +1114,7 @@ class LoginPlugin extends Plugin
             // Allow remember me to work with different login methods.
             $user = $users->load($username);
             if (is_callable([$user, 'refresh'])) {
-                $user->refresh(true);
+                $user->refresh();
             }
 
             $event->setCredential('username', $username);
@@ -1135,6 +1133,8 @@ class LoginPlugin extends Plugin
 
             $event->setStatus($event::AUTHENTICATION_SUCCESS);
             $event->stopPropagation();
+
+            return;
         }
     }
 
